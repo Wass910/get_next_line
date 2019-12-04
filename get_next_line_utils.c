@@ -10,27 +10,63 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "get_next_line.h"
+#include "get_next_line.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fcntl.h>
 
-void	ft_dest(char *dest, char *src)
+char	*ft_substr(char *s, int start, int len)
 {
-	int i;
-	int j;
+	int		i;
+	char	*str;
 
+	if (!s || !*s || start > ft_strlen(s))
+		return (ft_strdup(""));
 	i = 0;
-	j = 0;
-	while (src[i] != '\0' && src[i] != '\n')
+	if (!(str = malloc(sizeof(*str) * (len + 1))))
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		str[i] = s[i + start];
 		i++;
-	if (src[i])
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+void	*ft_calloc(int count, int size)
+{
+	void	*result;
+
+	if (count == 0)
+		return (ft_strdup(""));
+	if (!(result = malloc(count * size)))
+		return (NULL);
+	ft_bzero(result, count * size);
+	return (result);
+}
+
+char	*ft_strchr(char *s, int c)
+{
+	int		i;
+	int		a;
+
+	a = 0;
+	i = 0;
+	while (s[a] != '\0')
+		a++;
+	if (c == '\0')
+		return (s + a);
+	while (s[i] != '\0')
+	{
+		if (s[i] == c)
+			return (s + i);
 		i++;
-	while (src[i] != '\0')
-		dest[j++] = src[i++];
-	dest[i] = '\0';
+	}
+	return (NULL);
 }
 
 int		ft_count(char *s1, char *s2)
@@ -51,7 +87,7 @@ int		ft_count(char *s1, char *s2)
 	return (i);
 }
 
-char			*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin_free(char *s1, char *s2, int f)
 {
 	int		e;
 	int		i;
@@ -73,50 +109,9 @@ char			*ft_strjoin(char *s1, char *s2)
 		i++;
 		e++;
 	}
+	if (f == 1 || f == 3)
+		free(s1);
 	str[i] = '\0';
-	return (str);
-}
-
-int		ft_count_fin(char *s1, int ret)
-{
-	int i;
-	int e;
-
-	i = 0;
-	e = 0;
-	while (s1[i] != '\0')
-		i++;
-	while (e <= ret)
-	{
-		e++;
-		i++;
-	}
-	i = i + 2;
-	return (i);
-}
-
-char			*ft_strjoin_fin(char *s1, char *s2, int ret)
-{
-	int		e;
-	int		i;
-	char	*str;
-
-	e = 0;
-	i = ft_count_fin(s1, ret);
-	if (!(str = malloc(sizeof(*str) * i)))
-		return (NULL);
-	i = 0;
-	while (s1[i] != '\0')
-	{
-		str[i] = s1[i];
-		i++;
-	}
-	while (e <= ret)
-	{
-		str[i] = s2[e];
-		i++;
-		e++;
-	}
-	str[i] = '\0';
+	free(str);
 	return (str);
 }

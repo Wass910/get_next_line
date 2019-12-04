@@ -6,7 +6,7 @@
 /*   By: idhiba <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/17 18:17:13 by idhiba            #+#    #+#             */
-/*   Updated: 2019/11/17 18:17:15 by idhiba           ###   ########.fr       */
+/*   Updated: 2019/12/01 13:41:56 by idhiba           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,138 +17,98 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-int		ft_count_suivant(char *s1, char *s2, int ret)
-{
-	int i;
-	int e;
-
-	i = 0;
-	e = 0;
-	while (s1[i] != '\0')
-		i++;
-	while (s2[e] != '\0')
-	{
-		e++;
-	}
-    e = e - ret;
-	i = i + e + 2;
-	return (i);
-}
-
-char			*ft_strjoin_suivant(char *s1, char *s2, int ret)
+char	*ft_strdup(char *s)
 {
 	int		i;
 	char	*str;
+	int		e;
 
-	i = ft_count_suivant(s1, s2, ret);
-	if (!(str = malloc(sizeof(*str) * i)))
-		return (NULL);
+	e = 0;
 	i = 0;
-	while (s1[i] != '\0')
-	{
-		str[i] = s1[i];
+	while (s[i] != '\0')
 		i++;
-	}
-	while (s2[ret] != '\0')
+	if (!(str = malloc(sizeof(*str) * (i + 1))))
+		return (NULL);
+	while (e < i)
 	{
-		str[i] = s2[ret];
-		i++;
-		ret++;
+		str[e] = s[e];
+		e++;
 	}
-	str[i] = '\0';
+	str[e] = '\0';
 	return (str);
 }
 
-int check_line(char *str)
+int		ft_strlen(char *s)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (str[i] != '\0')
-    {
-        if (str[i] == '\n')
-            return (i);
-        i++;
-    }
-    return (0);
+	i = 0;
+	while (s[i] != '\0')
+	{
+		i++;
+	}
+	return (i);
 }
 
-int read_line(int fd, char **line, char *dest)
+void	ft_bzero(void *s, int n)
 {
-    int             ret;
-    char            str[BUFFER_SIZE +1];
-    int             i;
+	unsigned char	*tmp;
+	int				i;
 
-    /*if (!(str = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1))))
-        return (-1);*/
-    if (!(*line = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1))))
-        return (-1);
-    i = 0;
-    if (dest[i] != '\0')
-    {
-        while (dest[i] != '\0')
-        {
-            (*line)[i] = dest[i];
-            i++;
-        }
-    }
-
-    while ((ret = read(fd, str, BUFFER_SIZE)))
-    {
-
-        if (ret == BUFFER_SIZE)
-        {
-            str[ret] = '\0';
-            if ((check_line(str)) == 0)
-            {
-                dest = ft_strjoin(dest, str);
-            }
-            if ((i = check_line(str)) > 0)
-            {
-                *line = ft_strjoin_fin(dest, str, i);
-                ft_dest(dest, str);
-                return (1);
-            }  
-            /*if (ret < BUFFER_SIZE)
-            {
-                str[ret] = '\0';
-                //printf("%s\n", str);  
-                //free(str); 
-                return (0);
-            }*/
-        }
-    }
-    return (-1);
+	i = 0;
+	tmp = s;
+	while (n > 0)
+	{
+		*tmp = (unsigned char)i;
+		tmp[i] = '\0';
+		tmp++;
+		n--;
+	}
 }
 
-int get_next_line(int fd, char **line)
+int		read_line(int fd, char **dest)
 {
-    static char *dest;
+	char	*buff;
+	int		ret;
 
-    if (!dest)
-        if (!(dest = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1))))
-            return (-1);
-    if (fd == -1 || !line || BUFFER_SIZE <= 0)
+	if (!(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (-1);
-    if (read_line(fd, line, dest) == 1)
-        return (1);
-    else if ((read_line(fd, line, dest) == 0))
-        return (0);
-    return (-1);
+	while (!ft_strchr(*dest, '\n') && (ret = read(fd, buff, BUFFER_SIZE)))
+	{
+		if (ret == -1)
+			return (-1);
+		buff[ret] = '\0';
+		if ((*dest = ft_strjoin_free(*dest, buff, 1)) == NULL)
+			return (-1);
+	}
+	free(buff);
+	return (ret);
 }
-int main()
-{
-    char  *line;
-    int   fd;
-    int ret= 0;
 
-    fd = open("test.txt", O_RDONLY);
-    if (fd == -1)
-        return (1);
-    //while ((get_next_line(fd, &line)) == 1)
-    while ((ret = get_next_line(fd, &line)) == 1)
-    {
-        printf("ret = %d, %s\n", ret, line);
-    }
-    return (0);
+int		get_next_line(int fd, char **line)
+{
+	static char	*dest;
+	int			ret;
+	int			i;
+
+	i = 0;
+	if (BUFFER_SIZE <= 0 || !line || fd < 0)
+		return (-1);
+	if (!(dest))
+		dest = ft_calloc(1, 1);
+	if ((ret = read_line(fd, &dest)) == -1)
+		return (-1);
+	while (dest[i] != '\n' && dest[i] != '\0')
+		i++;
+	*line = ft_substr(dest, 0, i);
+	if (dest[i] == '\n')
+		dest = ft_strdup(dest + i + 1);
+	else
+		dest = NULL;
+	if (!dest && !ret)
+	{
+		free(dest);
+		return (0);
+	}
+	return (1);
 }
