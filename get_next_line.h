@@ -32,5 +32,7 @@ char	*ft_substr(char *s, int start, int len);
 char	*ft_strdup(char *s);
 int		ft_strlen(char *s);
 void	ft_bzero(void *s, int n);
+int		ft_count(char *s1, char *s2);
+int		read_line(int fd, char **dest);
 
 #endif

@@ -98,6 +98,7 @@ int		get_next_line(int fd, char **line)
 		dest = ft_calloc(1, 1);
 	if ((ret = read_line(fd, &dest)) == -1)
 		return (-1);
+	free(dest);
 	while (dest[i] != '\n' && dest[i] != '\0')
 		i++;
 	*line = ft_substr(dest, 0, i);

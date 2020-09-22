@@ -112,6 +112,5 @@ char	*ft_strjoin_free(char *s1, char *s2, int f)
 	if (f == 1 || f == 3)
 		free(s1);
 	str[i] = '\0';
-	free(str);
 	return (str);
 }
