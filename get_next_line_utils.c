@@ -6,7 +6,7 @@
 /*   By: idhiba <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/17 18:17:30 by idhiba            #+#    #+#             */
-/*   Updated: 2019/11/17 18:17:37 by idhiba           ###   ########.fr       */
+/*   Updated: 2020/09/24 13:57:20 by idhiba           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,25 @@ char	*ft_substr(char *s, int start, int len)
 
 void	*ft_calloc(int count, int size)
 {
-	void	*result;
+	void			*result;
+	unsigned char	*tmp;
+	int				i;
+	int				n;
 
+	i = 0;
 	if (count == 0)
 		return (ft_strdup(""));
 	if (!(result = malloc(count * size)))
 		return (NULL);
-	ft_bzero(result, count * size);
+	tmp = result;
+	n = count * size;
+	while (n > 0)
+	{
+		*tmp = (unsigned char)i;
+		tmp[i] = '\0';
+		tmp++;
+		n--;
+	}
 	return (result);
 }
 
@@ -93,6 +105,7 @@ char	*ft_strjoin_free(char *s1, char *s2, int f)
 	int		i;
 	char	*str;
 
+	f = 0;
 	e = 0;
 	i = ft_count(s1, s2);
 	if (!(str = malloc(sizeof(*str) * i)))
@@ -109,8 +122,7 @@ char	*ft_strjoin_free(char *s1, char *s2, int f)
 		i++;
 		e++;
 	}
-	if (f == 1 || f == 3)
-		free(s1);
+	free(s1);
 	str[i] = '\0';
 	return (str);
 }

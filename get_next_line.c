@@ -6,7 +6,7 @@
 /*   By: idhiba <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/17 18:17:13 by idhiba            #+#    #+#             */
-/*   Updated: 2019/12/01 13:41:56 by idhiba           ###   ########.fr       */
+/*   Updated: 2020/09/24 14:45:39 by idhiba           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,22 +50,6 @@ int		ft_strlen(char *s)
 	return (i);
 }
 
-void	ft_bzero(void *s, int n)
-{
-	unsigned char	*tmp;
-	int				i;
-
-	i = 0;
-	tmp = s;
-	while (n > 0)
-	{
-		*tmp = (unsigned char)i;
-		tmp[i] = '\0';
-		tmp++;
-		n--;
-	}
-}
-
 int		read_line(int fd, char **dest)
 {
 	char	*buff;
@@ -85,6 +69,24 @@ int		read_line(int fd, char **dest)
 	return (ret);
 }
 
+char	*ft_no_leaks(char *dest, int i)
+{
+	char	*tmp;
+
+	if (dest[i] == '\n')
+	{
+		tmp = dest;
+		dest = ft_strdup(tmp + i + 1);
+		free(tmp);
+	}
+	else
+	{
+		free(dest);
+		dest = NULL;
+	}
+	return (dest);
+}
+
 int		get_next_line(int fd, char **line)
 {
 	static char	*dest;
@@ -98,14 +100,10 @@ int		get_next_line(int fd, char **line)
 		dest = ft_calloc(1, 1);
 	if ((ret = read_line(fd, &dest)) == -1)
 		return (-1);
-	free(dest);
 	while (dest[i] != '\n' && dest[i] != '\0')
 		i++;
 	*line = ft_substr(dest, 0, i);
-	if (dest[i] == '\n')
-		dest = ft_strdup(dest + i + 1);
-	else
-		dest = NULL;
+	dest = ft_no_leaks(dest, i);
 	if (!dest && !ret)
 	{
 		free(dest);
